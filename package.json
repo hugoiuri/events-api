@@ -1,0 +1,43 @@
+{
+  "name": "events-api",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "nodes": "10.15.3"
+  },
+  "scripts": {
+    "depcheck": "depcheck",
+    "coverage": "nyc report",
+    "check": "eslint ./src/**.js .",
+    "check-coverage": "nyc check-coverage  --branches 50 --functions 50 --lines 50",
+    "pretest": "npm run depcheck && npm run check",
+    "test": "nyc --reporter=lcov _mocha",
+    "posttest": "npm run coverage && npm run check-coverage",
+    "start": "node ./src/index.js",
+    "stress": "autocannon -c 20 -d 60 -p 10 -l http://localhost:8339/event-names?text=co"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "compression": "^1.7.3",
+    "cors": "^2.8.5",
+    "djv": "^2.1.2",
+    "eslint": "^5.15.1",
+    "express": "^4.16.4",
+    "helmet": "^3.15.1",
+    "mongodb": "^3.1.13",
+    "morgan": "^1.9.1",
+    "nconf": "^0.10.0",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "autocannon": "^3.2.0",
+    "chai": "^4.2.0",
+    "depcheck": "^0.7.2",
+    "mocha": "^6.0.2",
+    "nyc": "^13.3.0",
+    "supertest": "^3.4.2"
+  }
+}

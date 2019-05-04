@@ -1,0 +1,60 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/build
+    docker:
+      - image: hugoiuri/circleci-build-node:10.15.3
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASSWORD
+      - image: mongo:3.4.1
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 18.05.0-ce
+      - run:
+          name: Installing NPM Modules
+          command: npm install
+      - run:
+          name: Executing Tests
+          command: npm test
+      - run:
+          name: Building and Publishing Image
+          command: bash ./scripts/publish-docker-image.sh
+      - store_artifacts:
+          path: coverage
+
+  deploy:
+    working_directory: ~/build
+    docker:
+      - image: hugoiuri/circleci-build-node:10.15.3
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 18.05.0-ce
+      - run:
+          name: Deploying Release Image in Dev
+          command: |
+            export SWARM_DEPLOY_CA=$SWARM_DEV_CA
+            export SWARM_DEPLOY_CERT=$SWARM_DEV_CERT
+            export SWARM_DEPLOY_KEY=$SWARM_DEV_KEY
+            export SWARM_DEPLOY_HOST=$SWARM_DEV
+
+            bash ./scripts/swarm-deploy.sh
+
+workflows:
+  version: 2
+  automated-deploy-process:
+    jobs:
+      - build:
+          context: org-global
+      - deploy:
+          context: org-global
+          filters:
+            branches:
+              only: master
+          requires:
+            - build

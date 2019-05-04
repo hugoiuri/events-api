@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  events-api:
+    #{PACKAGE_VERSION} é substituido automaticamente durante o deploy pela versão do package.json
+    image: hugoiuri/events-api:{PACKAGE_VERSION}
+    ports:
+      - "8339:8339"
+    environment:
+      - "PORT=8339"
+      - "LOG_LEVEL=info"
+      - "LOG_HEALTH_STATUS=false"
+      - "LOG_ALL_REQUESTS=true"
+      - "DATABASE_URI=mongodb://project-model:project%24model@db-a.dev.local:26689/databaseModel"
+      - "DATABASE_NAME=databaseModel"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 5s
+      placement:
+        constraints: [node.labels.engine == true]

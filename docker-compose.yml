@@ -1,0 +1,17 @@
+version: '3'
+services:
+  api:
+    build: .
+    ports:
+      - "8339:8339"
+    environment:
+      - PORT=8339
+      - LOG_HEALTH_STATUS=false
+      - LOG_ALL_REQUESTS=true
+      - LOG_LEVEL=info
+      - DATABASE_NAME=events
+      - DATABASE_URI=mongodb://mongo:27017/events
+    depends_on:
+      - mongo
+  mongo:
+    image: "mongo:4.0.6"
